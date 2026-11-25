@@ -63,8 +63,12 @@ canvas{display:block;width:100%;height:205px;border-radius:10px;background:#120f
 .lyrics .l2{font-size:13px;color:var(--mute);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lyrics span.done{color:var(--accent2)}
 .lyrics span.now{color:var(--accent)}
-.meter{width:110px;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.meter{position:relative;width:300px;height:16px;border-radius:4px;background:var(--line);overflow:hidden}
 .meter i{display:block;height:100%;width:0;background:var(--accent2)}
+.meter i.mid{background:#e8c35a}
+.meter i.hot{background:var(--accent)}
+.screamlbl{font-weight:700;letter-spacing:.5px}
+.screamval{width:40px;font-weight:700;font-variant-numeric:tabular-nums}
 /* overlays (inside the stage) */
 .modal{position:absolute;inset:0;background:rgba(5,3,10,.78);display:flex;align-items:center;justify-content:center;padding:14px;z-index:10}
 .dlg{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;width:100%;max-width:540px;max-height:372px;overflow:auto}
@@ -113,7 +117,7 @@ code{background:var(--panel2);padding:1px 4px;border-radius:4px;font-size:11px}
         <label><input type="checkbox" id="optGuide" checked> Guide melody</label>
         <label>level <input type="range" id="guideLvl" min="0" max="100" value="60"></label>
         <label><input type="checkbox" id="optCount" checked> Count-in</label>
-        <span title="Otherwise the mic hears the guide.">Headphones recommended · any octave counts</span>
+        <span title="Otherwise the mic hears the guide.">Headphones recommended · volume = accuracy × scream</span>
       </div>
       <span class="spacer"></span>
       <button class="primary" id="startBtn" disabled>Start 10 s clip</button>
@@ -123,12 +127,12 @@ code{background:var(--panel2);padding:1px 4px;border-radius:4px;font-size:11px}
   <section class="screen" id="singView" hidden>
     <div class="row">
       <div style="min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;flex:1"><b id="stTitle"></b> <span class="mute" id="stSub"></span></div>
-      <div class="stats"><span>Accuracy <b id="liveAcc">–</b></span><span>Time <b id="timeLeft">10.0</b>s</span></div>
+      <div class="stats"><span>Accuracy <b id="liveAcc">–</b></span><span>Scream <b id="liveScream">–</b></span><span>Volume <b id="liveVol">–</b></span><span>Time <b id="timeLeft">10.0</b>s</span></div>
     </div>
     <canvas id="cv"></canvas>
     <div class="lyrics" id="lyrics"><div class="l1"></div><div class="l2"></div></div>
     <div class="row">
-      <span class="mute">Mic</span><div class="meter"><i id="micLvl"></i></div><span class="mute" id="pitchRead" style="width:34px">–</span>
+      <span class="screamlbl">SCREAM</span><div class="meter" title="Louder = louder"><i id="micLvl"></i></div><span class="screamval" id="screamNow">0%</span><span class="mute" id="pitchRead" style="width:34px">–</span>
       <span class="spacer"></span>
       <button id="abortBtn">Abort (keep old volume)</button>
     </div>
@@ -366,7 +370,7 @@ function renderVolume(){
   bar.setAttribute('aria-valuenow', Math.round(volume));
   $('w1').style.opacity = volume > 0 ? 1 : .15;
   $('w2').style.opacity = volume > 50 ? 1 : .15;
-  $('volMsg').textContent = volSource ? `Set by singing “${volSource}”.` : 'Nobody has sung yet. Default 50%.';
+  $('volMsg').textContent = volSource ? `Set by: ${volSource}` : 'Nobody has sung yet. Default 50%.';
 }
 function setVolume(v, src){
   volume = Math.max(0, Math.min(100, Math.round(v)));
@@ -616,11 +620,11 @@ async function startSession(){
   while(hi - lo < 14){ lo--; hi++; }
 
   S = {song, ...built, stream, an, micSrc, nodes, startTime, lo, hi,
-       buf:new Float32Array(an.fftSize), samples:[], hitSum:0, wSum:0, lastT:null,
+       buf:new Float32Array(an.fftSize), samples:[], hitSum:0, wSum:0, loudSum:0, loudLive:0, lastT:null,
        hist:[], lastVoiced:-9, lastMidi:null, curPh:-2, curEv:-2, raf:0};
   showScreen('singView');
   $('stTitle').textContent = song.title; $('stSub').textContent = song.artist ? '· ' + song.artist : '';
-  $('liveAcc').textContent = '–';
+  $('liveAcc').textContent = '–'; $('liveScream').textContent = '–'; $('liveVol').textContent = '–';
   if(song.kind === 'audio') setLyrics('No lyrics, just follow the bars', '');
   sizeCanvas();
   S.raf = requestAnimationFrame(loop);
@@ -633,13 +637,27 @@ function eventAt(t){
   while(lo <= hi){ const m = (lo + hi) >> 1; if(t < e[m].t0) hi = m - 1; else if(t >= e[m].t1) lo = m + 1; else return m; }
   return -1;
 }
+/* scream: -45 dBFS (quiet singing) = 0, -10 dBFS (shouting into the mic) = 1 */
+function loudness(rms){
+  const db = 20 * Math.log10(Math.max(rms, 1e-6));
+  return Math.max(0, Math.min(1, (db + 45) / 35));
+}
 function errScore(err){ return err <= 0.5 ? 1 : err >= 1.75 ? 0 : 1 - (err - 0.5) / 1.25; }
 
 function loop(){
   if(!S) return;
   const now = ctx.currentTime - S.startTime;
   $('timeLeft').textContent = Math.max(0, Math.min(CLIP, CLIP - now)).toFixed(1);
-  if(S.wSum > 0.3) $('liveAcc').textContent = Math.round(S.hitSum / S.wSum * 100) + '%';
+  if(S.wSum > 0.3){
+    const a = S.hitSum / S.wSum, l = S.loudSum / S.wSum;
+    $('liveAcc').textContent = Math.round(a * 100) + '%';
+    $('liveScream').textContent = Math.round(l * 100) + '%';
+    $('liveVol').textContent = Math.round(a * l * 100) + '%';
+  }
+  const lv = S.loudLive, m = $('micLvl');
+  m.style.width = (lv * 100) + '%';
+  m.className = lv >= 0.75 ? 'hot' : lv >= 0.4 ? 'mid' : '';
+  $('screamNow').textContent = Math.round(lv * 100) + '%';
   updateLyrics(now);
   draw(now);
   S.raf = requestAnimationFrame(loop);
@@ -660,7 +678,8 @@ function tick(){
   } else {
     if(now - S.lastVoiced < 0.08) midi = S.lastMidi; else S.hist.length = 0;
   }
-  $('micLvl').style.width = Math.min(100, r.rms * 600) + '%';
+  const loud = loudness(r.rms);
+  S.loudLive = loud > S.loudLive ? loud : S.loudLive * 0.9 + loud * 0.1;   // fast attack, slow release
   $('pitchRead').textContent = midi != null ? midiName(midi) : '–';
 
   // --- scoring ---
@@ -681,7 +700,7 @@ function tick(){
         }
       }
       S.evs[idx].hit += best * dt; S.evs[idx].w += dt;
-      S.hitSum += best * dt; S.wSum += dt;
+      S.hitSum += best * dt; S.wSum += dt; S.loudSum += loud * dt;
     }
     S.samples.push({t:now, m:disp});
     S.lastT = now;
@@ -797,15 +816,17 @@ function finish(aborted){
   const s = S; S = null;
   showScreen(aborted ? 'picker' : 'home');
   if(aborted) return;
-  const acc = s.wSum > 0 ? s.hitSum / s.wSum * 100 : 0;
-  const pct = Math.round(acc);
+  const acc = s.wSum > 0 ? s.hitSum / s.wSum : 0;
+  const scr = s.wSum > 0 ? s.loudSum / s.wSum : 0;
+  const pct = Math.round(acc * scr * 100);
   const hit = s.evs.filter(e => e.w > 0 && e.hit / e.w >= 0.5).length;
   const total = s.evs.filter(e => e.w > 0).length;
-  setVolume(pct, s.song.title);
+  const A = Math.round(acc * 100), L = Math.round(scr * 100);
+  setVolume(pct, `“${s.song.title}”, ${A}% in tune × ${L}% scream`);
   $('resSong').textContent = s.song.title;
   $('resPct').textContent = pct + '%';
-  $('resMsg').textContent = verdict(pct);
-  $('resNotes').textContent = `${hit} of ${total} notes on pitch · volume is now ${pct}%`;
+  $('resMsg').textContent = A >= 60 && L < 40 ? 'Lovely pitch. Now SCREAM it.' : verdict(pct);
+  $('resNotes').textContent = `${A}% in tune × ${L}% scream · ${hit} of ${total} notes on pitch`;
   $('result').hidden = false;
 }
 $('abortBtn').onclick = () => finish(true);
