@@ -1,24 +1,30 @@
-# <your project's name>
+# Karaoke Volume
 
-<!-- This README is the front door of your project: the gallery shows its first lines. -->
+Your volume is your singing accuracy. Pick a song, sing a 30-second clip into your mic, and whatever percentage you hit becomes the volume. No slider. No mercy.
 
 ## what it is
 
-<one or two sentences: what is your evil input?>
+A volume bar you can't click or drag. The only way to change it is to sing karaoke. Your pitch is tracked live against the melody, and your accuracy score *is* the new volume.
 
 ## what input it collects
 
-<text? a volume? a phone number? brightness? a time? and how does it make that miserable?>
+A volume from 0 to 100%. It's miserable because:
+
+- you have to sing for it, out loud, for 30 seconds
+- being in tune within half a semitone gets full credit; 1¾ semitones off gets nothing
+- if you want 37%, good luck being exactly 37% good
+- clicking the bar just makes it shake at you
+
+Songs: six public-domain classics built in, or write your own (notes + lyrics), or load any audio file and the melody gets extracted (works best with isolated vocals). Any octave counts. Everything runs in the browser: no servers, no paid APIs, and the mic audio never leaves your computer.
 
 ## screenshot
 
-<!-- drag a screenshot or a gif into this file on github.com to upload it -->
 ![screenshot](screenshot.png)
 
 ## live
 
-https://<your-github-name>.github.io/<this-repo>/
+https://dariuspipin.github.io/evil-volume/
 
 ## how to run it
 
-open `index.html` in a browser. that's it.
+open `index.html` in a browser (Chrome or Edge) and allow the microphone. headphones recommended, otherwise the mic hears the guide melody.
