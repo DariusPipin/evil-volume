@@ -1,6 +1,6 @@
 # Karaoke Volume
 
-Your volume is your singing accuracy. Pick a song, sing a 30-second clip into your mic, and whatever percentage you hit becomes the volume. No slider. No mercy.
+Your volume is your singing accuracy. Pick a song, sing a 10-second clip into your mic, and whatever percentage you hit becomes the volume. No slider. No mercy.
 
 ## what it is
 
@@ -10,7 +10,7 @@ A volume bar you can't click or drag. The only way to change it is to sing karao
 
 A volume from 0 to 100%. It's miserable because:
 
-- you have to sing for it, out loud, for 30 seconds
+- you have to sing for it, out loud, for 10 seconds
 - being in tune within half a semitone gets full credit; 1¾ semitones off gets nothing
 - if you want 37%, good luck being exactly 37% good
 - clicking the bar just makes it shake at you

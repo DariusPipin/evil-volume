@@ -116,14 +116,14 @@ code{background:var(--panel2);padding:1px 4px;border-radius:4px;font-size:11px}
         <span title="Otherwise the mic hears the guide.">Headphones recommended · any octave counts</span>
       </div>
       <span class="spacer"></span>
-      <button class="primary" id="startBtn" disabled>Start 30 s clip</button>
+      <button class="primary" id="startBtn" disabled>Start 10 s clip</button>
     </div>
   </section>
 
   <section class="screen" id="singView" hidden>
     <div class="row">
       <div style="min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;flex:1"><b id="stTitle"></b> <span class="mute" id="stSub"></span></div>
-      <div class="stats"><span>Accuracy <b id="liveAcc">–</b></span><span>Time <b id="timeLeft">30.0</b>s</span></div>
+      <div class="stats"><span>Accuracy <b id="liveAcc">–</b></span><span>Time <b id="timeLeft">10.0</b>s</span></div>
     </div>
     <canvas id="cv"></canvas>
     <div class="lyrics" id="lyrics"><div class="l1"></div><div class="l2"></div></div>
@@ -157,7 +157,7 @@ code{background:var(--panel2);padding:1px 4px;border-radius:4px;font-size:11px}
       </div>
       <label class="f">Notes</label>
       <textarea id="edSrc" spellcheck="false" placeholder="C4:1:Twin- C4:1:kle G4:1:twin- G4:1:kle A4:1:lit- A4:1:tle G4:2:star |"></textarea>
-      <p class="hint" style="margin-top:6px">Tokens are <code>NOTE:BEATS:lyric</code> (e.g. <code>F#4:1.5:hel-</code>). Rest <code>R:1</code>. Trailing <code>-</code> joins syllables, <code>_</code> holds the word, <code>|</code> starts a new lyric line. Loops if shorter than 30 s.</p>
+      <p class="hint" style="margin-top:6px">Tokens are <code>NOTE:BEATS:lyric</code> (e.g. <code>F#4:1.5:hel-</code>). Rest <code>R:1</code>. Trailing <code>-</code> joins syllables, <code>_</code> holds the word, <code>|</code> starts a new lyric line. Loops if shorter than 10 s.</p>
       <div class="err" id="edErr"></div>
       <div class="row"><button class="primary" id="edSave">Save song</button><button id="edCancel">Cancel</button></div>
     </div>
@@ -166,7 +166,7 @@ code{background:var(--panel2);padding:1px 4px;border-radius:4px;font-size:11px}
   <div class="modal" id="audioDlg" hidden>
     <div class="dlg">
       <h2>Any song, from an audio file</h2>
-      <p class="mute" style="margin:6px 0 0;font-size:13px">The melody of 30 s from your file is extracted in the browser and becomes the clip. Works best with <b>isolated vocals / a cappella</b>. A full band mix confuses the pitch tracker.</p>
+      <p class="mute" style="margin:6px 0 0;font-size:13px">The melody of 10 s from your file is extracted in the browser and becomes the clip. Works best with <b>isolated vocals / a cappella</b>. A full band mix confuses the pitch tracker.</p>
       <div class="two">
         <div><label class="f">Audio file</label><input type="file" id="adFile" accept="audio/*"></div>
         <div><label class="f">Start at (s)</label><input type="number" id="adStart" value="0" min="0" step="0.5"></div>
@@ -182,9 +182,9 @@ code{background:var(--panel2);padding:1px 4px;border-radius:4px;font-size:11px}
 <script>
 (() => {
 'use strict';
-const CLIP = 30;            // seconds sung
+const CLIP = 10;            // seconds sung
 const LEAD = 3;             // countdown seconds
-const VIEW = 6;             // seconds visible on canvas
+const VIEW = 12;            // seconds visible on canvas (higher = shorter, denser note bars)
 const PLAYHEAD = 0.22;      // playhead position (fraction of width)
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -520,7 +520,7 @@ $('adGo').onclick = async () => {
     await new Promise(r => setTimeout(r, 30));
     const evs = await extractMelody(buf, start);
     const voiced = evs.reduce((a, e) => a + e.t1 - e.t0, 0);
-    if(voiced < 3) throw new Error('Could not find a clear melody there. Try an a cappella / isolated-vocal track or another start time.');
+    if(voiced < 1.5) throw new Error('Could not find a clear melody there. Try an a cappella / isolated-vocal track or another start time.');
     audioSong = {id:'audio', kind:'audio', title:f.name.replace(/\.[^.]+$/, ''), artist:'Your file', buffer:buf, offset:start, evs};
     selectedId = 'audio'; $('audioDlg').hidden = true; renderSongs();
   }catch(e){
