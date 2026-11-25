@@ -33,6 +33,9 @@ button.small{padding:2px 7px;font-size:11px;border-radius:6px}
 .volrow svg{flex:none;width:40px;height:40px}
 .bar{flex:1;display:flex;gap:4px;cursor:not-allowed;min-width:0}
 .seg{flex:1;height:64px;border-radius:6px;background:var(--line);transition:background .25s}
+.seg.on{background:var(--accent2)}
+.ic{width:15px;height:15px;flex:none;vertical-align:-2px;margin-right:7px}
+button,.btn{display:inline-flex;align-items:center}
 .pct{flex:none;width:100px;text-align:right;font-size:40px;font-weight:750;font-variant-numeric:tabular-nums}
 .volmsg{margin-top:10px;color:var(--mute);font-size:13px;min-height:1.4em}
 .shake{animation:shake .35s}
@@ -40,10 +43,12 @@ button.small{padding:2px 7px;font-size:11px;border-radius:6px}
 .bigbtn{font-size:17px;padding:12px 22px}
 /* picker */
 .songs{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0 10px;align-content:start;padding-right:2px}
-.song{position:relative;text-align:left;padding:9px 11px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);cursor:pointer;min-height:62px}
+.song{position:relative;text-align:left;padding:9px 11px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);cursor:pointer;min-height:54px;display:flex;align-items:center}
+.song.has-tools{padding-top:26px;align-items:flex-start}
 .song b{display:block;font-size:13px;line-height:1.25}
 .song small{color:var(--mute);font-size:11px}
-.song.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.song.sel{border:2px solid var(--accent);padding:8px 10px}
+.song.sel.has-tools{padding-top:25px}
 .song.add{border-style:dashed;background:transparent}
 .song .tools{position:absolute;top:5px;right:5px;display:flex;gap:3px}
 .opts{display:flex;flex-wrap:wrap;gap:14px;color:var(--mute);font-size:12px;align-items:center}
@@ -57,12 +62,12 @@ canvas{display:block;width:100%;height:205px;border-radius:10px;background:#120f
 .lyrics .l1{font-size:21px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lyrics .l2{font-size:13px;color:var(--mute);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lyrics span.done{color:var(--accent2)}
-.lyrics span.now{color:var(--accent);text-shadow:0 0 12px rgba(255,79,163,.6)}
+.lyrics span.now{color:var(--accent)}
 .meter{width:110px;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
 .meter i{display:block;height:100%;width:0;background:var(--accent2)}
 /* overlays (inside the stage) */
 .modal{position:absolute;inset:0;background:rgba(5,3,10,.78);display:flex;align-items:center;justify-content:center;padding:14px;z-index:10}
-.dlg{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;width:100%;max-width:540px;max-height:372px;overflow:auto}
+.dlg{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;width:100%;max-width:540px;max-height:372px;overflow:auto}
 .big{font-size:68px;font-weight:800;line-height:1;margin:6px 0;color:var(--accent);font-variant-numeric:tabular-nums}
 .dlg label.f{display:block;margin:8px 0 3px;color:var(--mute);font-size:12px}
 .dlg input[type=text],.dlg input[type=number],.dlg textarea{width:100%;font:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 9px}
@@ -88,27 +93,27 @@ code{background:var(--panel2);padding:1px 4px;border-radius:4px;font-size:11px}
     </div>
     <div class="volmsg" id="volMsg"></div>
     <div class="row" style="margin-top:18px">
-      <button class="primary bigbtn" id="singBtn">🎤 Sing to set volume</button>
+      <button class="primary bigbtn" id="singBtn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg>Sing to set volume</button>
     </div>
     <div class="spacer"></div>
     <div class="row">
       <span class="mute">Hear it:</span>
-      <button id="demoBtn">▶ Demo music</button>
+      <button id="demoBtn"><svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>Demo music</button>
       <label class="btn">Load your own audio<input type="file" id="ownFile" accept="audio/*" hidden></label>
-      <button id="ownBtn" hidden>▶ Play</button>
+      <button id="ownBtn" hidden>Play</button>
       <span id="ownName" class="mute" style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
     </div>
   </section>
 
   <section class="screen" id="picker" hidden>
-    <div class="row"><h2>Pick a song</h2><span class="spacer"></span><button id="cancelPick">← Back</button></div>
+    <div class="row"><h2>Pick a song</h2><span class="spacer"></span><button id="cancelPick"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Back</button></div>
     <div class="songs" id="songs"></div>
     <div class="row">
       <div class="opts">
         <label><input type="checkbox" id="optGuide" checked> Guide melody</label>
         <label>level <input type="range" id="guideLvl" min="0" max="100" value="60"></label>
         <label><input type="checkbox" id="optCount" checked> Count-in</label>
-        <span title="Otherwise the mic hears the guide.">🎧 headphones recommended · any octave counts</span>
+        <span title="Otherwise the mic hears the guide.">Headphones recommended · any octave counts</span>
       </div>
       <span class="spacer"></span>
       <button class="primary" id="startBtn" disabled>Start 30 s clip</button>
@@ -188,6 +193,12 @@ const store = {
   set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
 };
 
+const svgI = d => `<svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${d}</svg>`;
+const ICON = {
+  play: svgI('<path d="M7 4.5v15l12-7.5z"/>'),
+  stop: svgI('<rect x="6" y="6" width="12" height="12" rx="1.5"/>'),
+  pause: svgI('<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>')
+};
 function showScreen(id){ for(const k of ['home', 'picker', 'singView']) $(k).hidden = k !== id; }
 let toastTimer;
 function toast(html, ms = 4000){
@@ -350,10 +361,7 @@ const SEGS = 20;
 for(let i = 0; i < SEGS; i++){ const s = document.createElement('div'); s.className = 'seg'; bar.appendChild(s); }
 function renderVolume(){
   const segs = bar.children, on = Math.round(volume / 100 * SEGS);
-  for(let i = 0; i < SEGS; i++){
-    const hue = 165 - (i / (SEGS - 1)) * 200;   // teal -> pink
-    segs[i].style.background = i < on ? `hsl(${(hue + 360) % 360} 85% 62%)` : '';
-  }
+  for(let i = 0; i < SEGS; i++) segs[i].classList.toggle('on', i < on);
   $('pct').textContent = Math.round(volume) + '%';
   bar.setAttribute('aria-valuenow', Math.round(volume));
   $('w1').style.opacity = volume > 0 ? 1 : .15;
@@ -396,18 +404,18 @@ async function toggleDemo(force){
   ensureCtx();
   if(demoSrc || force === false){
     if(demoSrc){ try{ demoSrc.stop(); }catch(e){} demoSrc = null; }
-    $('demoBtn').textContent = '▶ Demo music'; return;
+    $('demoBtn').innerHTML = ICON.play + 'Demo music'; return;
   }
   pauseOwn();
   if(!demoBuf) demoBuf = await makeDemo();
   demoSrc = ctx.createBufferSource(); demoSrc.buffer = demoBuf; demoSrc.loop = true;
   demoSrc.connect(master); demoSrc.start();
-  $('demoBtn').textContent = '■ Stop demo';
+  $('demoBtn').innerHTML = ICON.stop + 'Stop demo';
 }
 $('demoBtn').onclick = () => toggleDemo();
 
 const ownEl = new Audio(); let ownNode = null;
-ownEl.onended = () => { $('ownBtn').textContent = '▶ Play'; };
+ownEl.onended = () => { $('ownBtn').innerHTML = ICON.play + 'Play'; };
 $('ownFile').onchange = e => {
   const f = e.target.files[0]; if(!f) return;
   ensureCtx();
@@ -415,12 +423,12 @@ $('ownFile').onchange = e => {
   if(ownEl.src) URL.revokeObjectURL(ownEl.src);
   ownEl.src = URL.createObjectURL(f);
   $('ownName').textContent = f.name; $('ownBtn').hidden = false;
-  toggleDemo(false); ownEl.play(); $('ownBtn').textContent = '❚❚ Pause';
+  toggleDemo(false); ownEl.play(); $('ownBtn').innerHTML = ICON.pause + 'Pause';
 };
-function pauseOwn(){ if(!ownEl.paused){ ownEl.pause(); } $('ownBtn').textContent = '▶ Play'; }
+function pauseOwn(){ if(!ownEl.paused){ ownEl.pause(); } $('ownBtn').innerHTML = ICON.play + 'Play'; }
 $('ownBtn').onclick = () => {
   ensureCtx();
-  if(ownEl.paused){ toggleDemo(false); ownEl.play(); $('ownBtn').textContent = '❚❚ Pause'; } else pauseOwn();
+  if(ownEl.paused){ toggleDemo(false); ownEl.play(); $('ownBtn').innerHTML = ICON.pause + 'Pause'; } else pauseOwn();
 };
 
 /* ---------- song picker ---------- */
@@ -435,16 +443,11 @@ function renderSongs(){
   for(const s of allSongs()){
     const b = document.createElement('div');
     b.className = 'song' + (s.id === selectedId ? ' sel' : ''); b.tabIndex = 0;
-    let meta;
-    if(s.kind === 'audio') meta = `From audio file · starts at ${s.offset}s`;
-    else {
-      const {notes} = parseSrc(s.src); const ms = notes.filter(n => n.midi != null).map(n => n.midi);
-      meta = `${s.bpm} BPM · ${ms.length ? midiName(Math.min(...ms)) + '–' + midiName(Math.max(...ms)) : 'empty'}`;
-    }
-    b.innerHTML = `<b>${esc(s.title)}</b><small>${esc(s.artist || 'You')}<br>${esc(meta)}</small>`;
+    b.innerHTML = `<b>${esc(s.title)}</b>`;
     if(s.custom){
+      b.classList.add('has-tools');
       const t = document.createElement('div'); t.className = 'tools';
-      t.innerHTML = '<button class="small" data-a="edit">edit</button><button class="small" data-a="del">✕</button>';
+      t.innerHTML = '<button class="small" data-a="edit">edit</button><button class="small" data-a="del">delete</button>';
       t.onclick = ev => {
         ev.stopPropagation(); const a = ev.target.dataset.a;
         if(a === 'edit') openEditor(s);
@@ -461,10 +464,10 @@ function renderSongs(){
     el.appendChild(b);
   }
   const add = document.createElement('button'); add.className = 'song add';
-  add.innerHTML = '<b>+ Write your own</b><small>Type in notes & lyrics</small>';
+  add.innerHTML = '<b>+ Write your own</b>';
   add.onclick = () => openEditor(null); el.appendChild(add);
   const aud = document.createElement('button'); aud.className = 'song add';
-  aud.innerHTML = '<b>+ Any song (audio file)</b><small>Extract the melody from a vocal track</small>';
+  aud.innerHTML = '<b>+ Any song (audio file)</b>';
   aud.onclick = () => { $('adErr').textContent = ''; $('audioDlg').hidden = false; }; el.appendChild(aud);
   $('startBtn').disabled = !songById(selectedId);
 }
@@ -618,7 +621,7 @@ async function startSession(){
   showScreen('singView');
   $('stTitle').textContent = song.title; $('stSub').textContent = song.artist ? '· ' + song.artist : '';
   $('liveAcc').textContent = '–';
-  if(song.kind === 'audio') setLyrics('♪ No lyrics, just follow the bars ♪', '');
+  if(song.kind === 'audio') setLyrics('No lyrics, just follow the bars', '');
   sizeCanvas();
   S.raf = requestAnimationFrame(loop);
   S.timer = setInterval(tick, 20);
@@ -741,10 +744,10 @@ function draw(now){
   for(const e of S.evs){
     const x0 = x(e.t0), x1 = x(e.t1); if(x1 < 0 || x0 > W) continue;
     let fill;
-    if(e.t1 <= now && e.w > 0){ const q = e.hit / e.w; fill = `hsl(${Math.round(q * 140)} 75% 55% / .85)`; }
+    if(e.t1 <= now && e.w > 0){ const q = e.hit / e.w; fill = q >= 0.66 ? '#43e0c8' : q >= 0.33 ? '#e8c35a' : '#ff5d5d'; }
     else if(now >= e.t0 && now < e.t1) fill = '#ff4fa3';
-    else fill = 'rgba(255,255,255,.2)';
-    g.fillStyle = fill; rr(g, x0 + 1, y(e.midi) - nh / 2, Math.max(2, x1 - x0 - 2), nh, nh / 2); g.fill();
+    else fill = '#3a3350';
+    g.fillStyle = fill; rr(g, x0 + 1, y(e.midi) - nh / 2, Math.max(2, x1 - x0 - 2), nh, 4); g.fill();
   }
   // sung trace
   g.lineWidth = 3; g.lineCap = 'round'; g.lineJoin = 'round';
