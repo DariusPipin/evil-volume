@@ -6,8 +6,8 @@
 <title>Karaoke Volume</title>
 <style>
 :root{
-  --bg:#0f0c16;--panel:#1a1624;--panel2:#241f31;--ink:#f4effd;--mute:#9a91ae;
-  --accent:#ff4fa3;--accent2:#43e0c8;--bad:#ff5d5d;--line:#2f2940;
+  --bg:#0d0f14;--panel:#161a22;--panel2:#1f2430;--ink:#eef1f6;--mute:#8d95a5;
+  --accent:#e5383b;--accent2:#3a86ff;--bad:#e5383b;--line:#2a3040;
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -22,9 +22,9 @@ h2{margin:0;font-size:17px}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .spacer{flex:1}
 button,.btn{font:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:7px 12px;cursor:pointer;white-space:nowrap}
-button:hover,.btn:hover{border-color:#4a4160}
+button:hover,.btn:hover{border-color:#3d4558}
 button:disabled{opacity:.45;cursor:not-allowed}
-button.primary{background:var(--accent);border-color:var(--accent);color:#1a0010;font-weight:650}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:650}
 button.small{padding:2px 7px;font-size:11px;border-radius:6px}
 .mute{color:var(--mute)}
 .hint{color:var(--mute);font-size:12px;margin:0}
@@ -57,7 +57,7 @@ button,.btn{display:inline-flex;align-items:center}
 /* singing */
 .stats{display:flex;gap:16px;color:var(--mute)}
 .stats b{color:var(--ink);font-variant-numeric:tabular-nums}
-canvas{display:block;width:100%;height:205px;border-radius:10px;background:#120f1b;border:1px solid var(--line);margin-top:8px}
+canvas{display:block;width:100%;height:205px;border-radius:10px;background:#11141b;border:1px solid var(--line);margin-top:8px}
 .lyrics{margin-top:8px;height:56px;text-align:center;overflow:hidden}
 .lyrics .l1{font-size:21px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lyrics .l2{font-size:13px;color:var(--mute);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -65,7 +65,7 @@ canvas{display:block;width:100%;height:205px;border-radius:10px;background:#120f
 .lyrics span.now{color:var(--accent)}
 .meter{position:relative;width:300px;height:16px;border-radius:4px;background:var(--line);overflow:hidden}
 .meter i{display:block;height:100%;width:0;background:var(--accent2)}
-.meter i.mid{background:#e8c35a}
+.meter i.mid{background:var(--accent2)}
 .meter i.hot{background:var(--accent)}
 .screamlbl{font-weight:700;letter-spacing:.5px}
 .screamval{width:40px;font-weight:700;font-variant-numeric:tabular-nums}
@@ -763,9 +763,9 @@ function draw(now){
   for(const e of S.evs){
     const x0 = x(e.t0), x1 = x(e.t1); if(x1 < 0 || x0 > W) continue;
     let fill;
-    if(e.t1 <= now && e.w > 0){ const q = e.hit / e.w; fill = q >= 0.66 ? '#43e0c8' : q >= 0.33 ? '#e8c35a' : '#ff5d5d'; }
-    else if(now >= e.t0 && now < e.t1) fill = '#ff4fa3';
-    else fill = '#3a3350';
+    if(e.t1 <= now && e.w > 0){ const q = e.hit / e.w; fill = q >= 0.66 ? '#3a86ff' : q >= 0.33 ? '#5a6b8f' : '#8f2426'; }
+    else if(now >= e.t0 && now < e.t1) fill = '#e5383b';
+    else fill = '#333a4a';
     g.fillStyle = fill; rr(g, x0 + 1, y(e.midi) - nh / 2, Math.max(2, x1 - x0 - 2), nh, 4); g.fill();
   }
   // sung trace
@@ -775,14 +775,14 @@ function draw(now){
   for(let i = S.samples.length - 1; i >= 0; i--){
     const s = S.samples[i]; if(s.t < tmin) break;
     if(s.m != null && prev && prev.m != null && prev.t - s.t < 0.12 && Math.abs(prev.m - s.m) < 3){
-      g.strokeStyle = '#43e0c8';
+      g.strokeStyle = '#3a86ff';
       g.beginPath(); g.moveTo(x(s.t), y(s.m)); g.lineTo(x(prev.t), y(prev.m)); g.stroke();
     }
     prev = s;
   }
   const last = S.samples[S.samples.length - 1];
   if(last && last.m != null && now - last.t < 0.1){
-    g.fillStyle = '#43e0c8'; g.beginPath(); g.arc(x(now), y(last.m), 6, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#3a86ff'; g.beginPath(); g.arc(x(now), y(last.m), 6, 0, Math.PI * 2); g.fill();
   }
   // playhead
   g.fillStyle = 'rgba(255,255,255,.55)'; g.fillRect(Math.round(W * PLAYHEAD), 0, 2, H);
